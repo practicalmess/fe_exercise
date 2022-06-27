@@ -29,7 +29,10 @@ function App() {
             }
         }
         fetchData()
-    }, [])
+    }, []);
+    const userProps: WithUserProps = {
+        user: sessionUser
+    }
     return (
         <Router>
             <div className="App" style={{ margin: '1rem' }}>
@@ -53,12 +56,12 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Home />} />
 
-                    <Route path="/states" element={<StateSearch />} />
-                    <Route path="/trade" element={<InterstateTrade />} />
-                    <Route path="/economy" element={<StateEconomySearch />} />
+                    <Route path="/states" element={<StateSearch {...userProps} />} />
+                    <Route path="/trade" element={<InterstateTrade {...userProps} />} />
+                    <Route path="/economy" element={<StateEconomySearch {...userProps} />} />
 
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/login" element={<Login {...userProps} />} />
+                    <Route path="/signup" element={<Signup {...userProps} />} />
                 </Routes>
             </div>
         </Router>
