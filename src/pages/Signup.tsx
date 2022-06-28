@@ -17,7 +17,7 @@ async function postSignupData(data: {username: string; password: string}){
         },
         body: JSON.stringify(data)
     });
-    return response.json();
+    return response;
 }
 
 
@@ -27,7 +27,11 @@ const onSubmit = ({userName, password}: SignupData) => {
         username: userName,
         password
     };
-    postSignupData(data).then(data => console.log(data)).catch(error => console.log(error));
+    postSignupData(data)
+        .then(() => {
+            window.location.href = '/';
+        })
+        .catch(error => console.log(error));
 }
 
 const Signup = ({user}: WithUserProps) => {
