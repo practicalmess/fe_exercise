@@ -1,8 +1,10 @@
 import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import client from '../api/client';
 import {gql} from '@apollo/client';
 import Input from '../components/input';
 import Button from '../components/button';
+import ResultsTable from '../components/table';
 import {WithUserProps} from '../App';
 
 interface State {
@@ -50,11 +52,20 @@ const StateSearch = ({user}: WithUserProps) => {
     const clearSearch = () => {
         setSearchText('');
     };
+    let navigate = useNavigate();
     useEffect(() => {
         if (!user?.id) {
-            window.location.href = '/login'
+            navigate('/login', {replace: true});
         }
     }, []);
+
+    const tableHeaders = [
+        'ID',
+        'Key',
+        'Name',
+        'Slug',
+        'Example API Endpoint'
+    ];
     return (
         <div>
             <h1>State List</h1>
@@ -65,33 +76,10 @@ const StateSearch = ({user}: WithUserProps) => {
                 <label htmlFor="searchText">Search state by name</label>
                 <Input type="text" value={searchText} name="searchText" onChange={(e: React.FormEvent<HTMLInputElement>) => setSearchText((e.target as HTMLInputElement).value)} />
                 </div>
+                <Button onClick={clearSearch}>X</Button>
                 <Button onClick={(e:React.MouseEvent<HTMLButtonElement, MouseEvent>) => searchStates(e, searchText)} >Submit</Button>
-                <Button onClick={clearSearch} >X</Button>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Key</th>
-                        <th>Name</th>
-                        <th>Slug</th>
-                        <th>Example API Endpoint</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {resultsData?.map((state: State) => {
-                    return(
-                    <tr>
-                        <td>{state.id}</td>
-                        <td>{state.key}</td>
-                        <td>{state.name}</td>
-                        <td>{state.slug}</td>
-                        <td><a href={state.link}>Population API</a></td>
-                    </tr>
-                    )
-                })}
-                </tbody>
-            </table>
+            <ResultsTable columnHeaders={tableHeaders} data={resultsData} />
         </div>
     );
 }

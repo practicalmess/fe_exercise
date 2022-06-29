@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react'
+import {useNavigate} from 'react-router-dom';
 import Input from '../components/input';
 import {WithUserProps} from '../App';
 
@@ -28,25 +29,26 @@ const onSubmit = ({userName, password}: SignupData) => {
         password
     };
     postSignupData(data)
-        .then(() => {
-            window.location.href = '/';
-        })
+        .then((data) => console.log(data))
         .catch(error => console.log(error));
 }
 
 const Signup = ({user}: WithUserProps) => {
-    useEffect(() => {
-        if (user?.id) {
-            window.location.href = '/'
-        }
-    }, [])
     const [userName, setUserName] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [alertLevel, setAlertLevel] = useState<string>('');
     const [alertMessage, setAlertMessage] =useState<string>('');
+    let navigate = useNavigate();
+    useEffect(() => {
+        if (user?.id) {
+            navigate('/', {replace: true});
+        }
+    }, []);
+    
     const validateInfo = (e: React.FormEvent<HTMLFormElement>, {userName, password, confirmPassword}: SignupData) => {
         e.preventDefault();
+        
         if(userName === '') {
             setAlertMessage('Please enter a username');
         } else if(password === '') {
@@ -55,6 +57,7 @@ const Signup = ({user}: WithUserProps) => {
             setAlertMessage('Passwords do not match')
         } else {
             onSubmit({userName, password, confirmPassword});
+            navigate('/');
         }
 
     }

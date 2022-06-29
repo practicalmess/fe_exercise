@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import {useNavigate} from 'react-router-dom';
 import Input from '../components/input';
 import {WithUserProps} from '../App';
 
@@ -21,15 +22,16 @@ async function postLoginData(data: {username: string; password: string}){
 }
 
 const Login = ({user}: WithUserProps) => {
-    useEffect(() => {
-        if (user?.id) {
-            window.location.href = '/'
-        }
-    }, [])
     const [userName, setUserName] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [alertLevel, setAlertLevel] = useState<string>('');
     const [alertMessage, setAlertMessage] =useState<string>('');
+    let navigate = useNavigate();
+    useEffect(() => {
+        if (user?.id) {
+            navigate('/', {replace: true});
+        }
+    }, []);
     const validateInfo = (e: React.FormEvent<HTMLFormElement>, {userName, password}: LoginData) => {
         e.preventDefault();
         if(userName === '') {
@@ -38,6 +40,7 @@ const Login = ({user}: WithUserProps) => {
             setAlertMessage('Please enter a password');
         } else {
             onSubmit({userName, password});
+            navigate('/');
         }
 
     }
@@ -50,7 +53,7 @@ const Login = ({user}: WithUserProps) => {
         .then(data => {
             switch(data.status) {
                 case 204:
-                    window.location.href = '/';
+                    console.log('Login success');
                     break;
                 case 403:
                     setAlertMessage('Username or password is incorrect');
