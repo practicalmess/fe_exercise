@@ -12,8 +12,10 @@ interface State {
     key: string,
     slug: string,
     name: string,
-    link: string
+    link: Element
 }
+
+const SampleLink = ({key}) => <a href={key}>Population API</a>;
 
 
 const StateSearch = ({user}: WithUserProps) => {
@@ -42,7 +44,7 @@ const StateSearch = ({user}: WithUserProps) => {
                 key: state.key,
                 slug: state.slug,
                 name: state.name,
-                link: `https://datausa.io/api/data?Geography=${state.key}&Nativity=2&measure=Total%20Population,Total%20Population%20MOE%20Appx&drilldowns=Birthplace&properties=Country%20Code`
+                link: <SampleLink key={state.key} />
             })
         });
         setResultsData(formattedData);

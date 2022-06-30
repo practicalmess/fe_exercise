@@ -7,6 +7,17 @@ import Input from '../components/input';
 import Button from '../components/button';
 import ResultsTable from '../components/table';
 
+interface TradeData {
+    'Destination State': string
+    'ID Destination State': string
+    'ID Origin': string
+    'ID Year': number
+    'Millions Of Dollars': number,
+    'Origin': string,
+    'Thousands Of Tons': number,
+    'Year': string
+}
+
 const queryTradeDataByState = async (stateId: String) => {
     const response = await fetch(`https://datausa.io/api/data?Origin%20State=${stateId}&measure=Millions%20Of%20Dollars,Thousands%20Of%20Tons&drilldowns=Destination%20State&year=latest`);
     return response.json();
@@ -28,27 +39,27 @@ const InterstateTrade = ({user}: WithUserProps) => {
             }
         });
         let formattedData = [];
-        statesList.data.states.forEach((state) => {
+        statesList.data.states.forEach((state: {id: string}) => {
             queryTradeDataByState(state.id).then(data => {
-                const dollarTotal = data.data.reduce((a, b) => a + b['Millions Of Dollars'], 0);
-                const tonsTotal = data.data.reduce((a, b) => a + b['Thousands Of Tons'], 0);
-                data.data.sort((a, b) => b['Millions Of Dollars'] - a['Millions Of Dollars']);
+                const dollarTotal = data.data.reduce((a: number, b: TradeData) => a + b['Millions Of Dollars'], 0);
+                const tonsTotal = data.data.reduce((a: number, b: TradeData) => a + b['Thousands Of Tons'], 0);
+                data.data.sort((a: TradeData, b: TradeData) => b['Millions Of Dollars'] - a['Millions Of Dollars']);
                 const topStatesDollars = data.data.slice(0, 5);
-                data.data.sort((a, b) => b['Thousands Of Tons'] - a['Thousands Of Tons']);
+                data.data.sort((a: TradeData, b: TradeData) => b['Thousands Of Tons'] - a['Thousands Of Tons']);
                 const topStatesTons = data.data.slice(0, 5);
                 formattedData.push({
-                    name: data.data,
+                    name: data.data[0]['Origin'],
                     dollarTotal,
                     tonsTotal,
                     topStatesDollars,
                     topStatesTons
-                })
+                });
             });
-            
+            setResultsData(formattedData);
         });
     };
     const [searchText, setSearchText] = useState<string>('');
-    const [resultsData, setResultsData] = useState([]);
+    const [resultsData, setResultsData] = useState<Array>([]);
     let navigate = useNavigate();
     useEffect(() => {
         if (!user?.id) {
