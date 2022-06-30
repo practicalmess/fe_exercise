@@ -22,21 +22,20 @@ const ResultsTable = (props) => {
 		    </thead>
 		    <tbody>
 		    {props.data?.map((row) => {
-		    	console.log(row);
 		        return(
-		        <tr>
-		        	{Object.keys(row).map(key => {
-		        		if (key == 'link') {
-		        			return <td><a href={row[key]}>Population API</a></td>
-		        		}
-		        		return (
-		        			<td>{row[key]}</td>
-		        		)
-		        	})}
-		        	{props.customColumn &&
-		        		<td>{props.customColumn}</td>
-		        	}
-		        </tr>
+			        <tr>
+			        	{Object.keys(row).map(key => {
+			        		if (key == 'link') {
+			        			return <td><a href={row[key]}>Population API</a></td>
+			        		}
+			        		return (
+			        			<td>{row[key]}</td>
+			        		)
+			        	})}
+			        	{props.customColumn &&
+			        		<td>{props.customColumn}</td>
+			        	}
+			        </tr>
 		        )
 		    })}
 		    </tbody>

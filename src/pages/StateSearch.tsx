@@ -12,10 +12,10 @@ interface State {
     key: string,
     slug: string,
     name: string,
-    link: Element
+    link: React.ReactElement
 }
 
-const SampleLink = ({key}) => <a href={key}>Population API</a>;
+const SampleLink = (props: {key: string}) => <a href={props.key}>Population API</a>;
 
 
 const StateSearch = ({user}: WithUserProps) => {

@@ -18,14 +18,58 @@ interface TradeData {
     'Year': string
 }
 
+interface FormattedTradeData {
+    name: string,
+    dollarTotal: number,
+    tonsTotal: number,
+    topStatesDollars: React.ReactElement,
+    topStatesTons: React.ReactElement
+}
+
+// TODO
+/*
+- make a component to render a list of top states by tons or dollars
+- pass custom component to table component
+- write tests
+    - clicking submit fires searchStates
+    - if data is present it will render in the expected HTML elements
+    - given a set of mock data it will calculate accurate totals
+- add keys for maps
+- create interface for formattedData
+*/
+
+enum SortByValue {
+    TONS,
+    DOLLARS
+}
+
+const TopStatesCell = (props: {statesData: TradeData[], sortBy: SortByValue}) => {
+    return (
+        <ul>
+            {props.statesData.map((state: TradeData) => {
+                switch (props.sortBy) {
+                    case 0:
+                        return (
+                            <li>{state['Destination State']}: {state['Thousands Of Tons']} thousand</li>
+                        );
+                    case 1:
+                    return (
+                        <li>{state['Destination State']}: ${state['Millions Of Dollars']} million</li>
+                    );
+                }
+                
+            })}
+        </ul>
+    );
+}
+
 const queryTradeDataByState = async (stateId: String) => {
     const response = await fetch(`https://datausa.io/api/data?Origin%20State=${stateId}&measure=Millions%20Of%20Dollars,Thousands%20Of%20Tons&drilldowns=Destination%20State&year=latest`);
     return response.json();
 }
 
 const InterstateTrade = ({user}: WithUserProps) => {
-    const searchStates = async (e:React.MouseEvent<HTMLButtonElement>, input: string) => {
-        e.preventDefault();
+    const searchStates = async (input: string) => {
         const statesList = await client.query({
             query: gql`
                 query Query($name: String) {
@@ -38,8 +82,8 @@ const InterstateTrade = ({user}: WithUserProps) => {
                 name: input
             }
         });
-        let formattedData = [];
-        statesList.data.states.forEach((state: {id: string}) => {
+        let formattedData: FormattedTradeData[] = [];
+        await statesList.data.states.forEach((state: {id: string}) => {
             queryTradeDataByState(state.id).then(data => {
                 const dollarTotal = data.data.reduce((a: number, b: TradeData) => a + b['Millions Of Dollars'], 0);
                 const tonsTotal = data.data.reduce((a: number, b: TradeData) => a + b['Thousands Of Tons'], 0);
@@ -51,21 +95,25 @@ const InterstateTrade = ({user}: WithUserProps) => {
                     name: data.data[0]['Origin'],
                     dollarTotal,
                     tonsTotal,
-                    topStatesDollars,
-                    topStatesTons
+                    topStatesDollars: <TopStatesCell statesData={topStatesDollars} sortBy={1} />,
+                    topStatesTons: <TopStatesCell statesData={topStatesTons} sortBy={0} />
                 });
             });
-            setResultsData(formattedData);
         });
+        return(formattedData);
     };
     const [searchText, setSearchText] = useState<string>('');
-    const [resultsData, setResultsData] = useState<Array>([]);
+    const [resultsData, setResultsData] = useState<FormattedTradeData[]>([]);
     let navigate = useNavigate();
     useEffect(() => {
         if (!user?.id) {
             navigate('/login', {replace: true});
         }
     }, []);
+    const handleSearch = async (input: string) => {
+        const results = await searchStates(input);
+        setResultsData(results);
+    }
 
     const tableHeaders = [
         'Name',
@@ -87,7 +135,7 @@ const InterstateTrade = ({user}: WithUserProps) => {
                     <Input type="text" value={searchText} name="searchText" onChange={(e: React.FormEvent<HTMLInputElement>) => setSearchText((e.target as HTMLInputElement).value)} />
                 </div>
                 <Button onClick={() => setSearchText('')}>X</Button>
-                <Button onClick={(e:React.MouseEvent<HTMLButtonElement, MouseEvent>) => searchStates(e, searchText)} >Submit</Button>
+                <Button onClick={() => handleSearch(searchText)} >Submit</Button>
             </div>
             <ResultsTable columnHeaders={tableHeaders} data={resultsData} />
         </div>
