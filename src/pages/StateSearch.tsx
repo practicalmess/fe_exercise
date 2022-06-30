@@ -48,10 +48,6 @@ const StateSearch = ({user}: WithUserProps) => {
         setResultsData(formattedData);
     };
     const [searchText, setSearchText] = useState<string>('');
-
-    const clearSearch = () => {
-        setSearchText('');
-    };
     let navigate = useNavigate();
     useEffect(() => {
         if (!user?.id) {
@@ -68,15 +64,16 @@ const StateSearch = ({user}: WithUserProps) => {
     ];
     return (
         <div>
-            <h1>State List</h1>
+            <h1>Search States</h1>
+            <h2>State List</h2>
             <div style={{
                 display: 'flex'
             }}>
-            <div>
-                <label htmlFor="searchText">Search state by name</label>
-                <Input type="text" value={searchText} name="searchText" onChange={(e: React.FormEvent<HTMLInputElement>) => setSearchText((e.target as HTMLInputElement).value)} />
+                <div>
+                    <label htmlFor="searchText">Search state by name</label>
+                    <Input type="text" value={searchText} name="searchText" onChange={(e: React.FormEvent<HTMLInputElement>) => setSearchText((e.target as HTMLInputElement).value)} />
                 </div>
-                <Button onClick={clearSearch}>X</Button>
+                <Button onClick={() => setSearchText('')}>X</Button>
                 <Button onClick={(e:React.MouseEvent<HTMLButtonElement, MouseEvent>) => searchStates(e, searchText)} >Submit</Button>
             </div>
             <ResultsTable columnHeaders={tableHeaders} data={resultsData} />
